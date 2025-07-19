@@ -2,6 +2,7 @@
 module paylancer_addr::test_payment_request {
     use std::string;
     use paylancer_addr::payment_request;
+    use std::option;
 
     #[test(sender = @paylancer_addr)]
     public fun test_create_payment_request(sender: &signer) {
@@ -14,6 +15,8 @@ module paylancer_addr::test_payment_request {
             string::utf8(b"pending"),
             1710000000
         );
+        let opt_req = payment_request::get_payment_request(signer::address_of(sender));
+        assert!(option::is_some(&opt_req), 200);
     }
 
     #[test(sender = @paylancer_addr)]
@@ -28,6 +31,10 @@ module paylancer_addr::test_payment_request {
             1710000000
         );
         payment_request::update_payment_status(sender, string::utf8(b"paid"));
+        let opt_req = payment_request::get_payment_request(signer::address_of(sender));
+        assert!(option::is_some(&opt_req), 201);
+        let req = option::extract(opt_req);
+        assert!(req.status == string::utf8(b"paid"), 202);
     }
 
     #[test(sender = @paylancer_addr)]
@@ -42,5 +49,7 @@ module paylancer_addr::test_payment_request {
             1710000000
         );
         payment_request::delete_payment_request(sender);
+        let opt_req = payment_request::get_payment_request(signer::address_of(sender));
+        assert!(!option::is_some(&opt_req), 203);
     }
 }

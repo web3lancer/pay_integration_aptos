@@ -63,7 +63,9 @@ module paylancer_addr::user {
     public entry fun update_user_email(account: &signer, new_email: String) acquires User {
         let user = borrow_global_mut<User>(signer::address_of(account));
         user.email = new_email;
-        user.updated_at = 0; // Set to current timestamp in production
+        // TODO: Set to current timestamp in production
+        // user.updated_at = Timestamp::now_seconds();
+        user.updated_at = 0;
     }
 
     public entry fun delete_user(account: &signer) acquires User {

@@ -3,6 +3,11 @@ module paylancer_addr::test_paylancer {
     use std::string;
     use std::option;
     use paylancer_addr::paylancer;
+    use paylancer_addr::user;
+    use paylancer_addr::wallet;
+    use paylancer_addr::payment_request;
+    use paylancer_addr::virtual_cards;
+    use paylancer_addr::virtual_accounts;
 
     #[test(sender = @paylancer_addr)]
     public fun test_create_user(sender: &signer) {
@@ -16,7 +21,8 @@ module paylancer_addr::test_paylancer {
             string::utf8(b"USD"),
             1710000000
         );
-        // No assert, just ensure no abort
+        let opt_user = user::get_user(signer::address_of(sender));
+        assert!(option::is_some(&opt_user), 300);
     }
 
     #[test(sender = @paylancer_addr)]
@@ -35,7 +41,8 @@ module paylancer_addr::test_paylancer {
             1710000000,
             option::some(string::utf8(b"inbuilt"))
         );
-        // No assert, just ensure no abort
+        let opt_wallet = wallet::get_wallet(signer::address_of(sender));
+        assert!(option::is_some(&opt_wallet), 301);
     }
 
     #[test(sender = @paylancer_addr)]
@@ -50,7 +57,8 @@ module paylancer_addr::test_paylancer {
             string::utf8(b"pending"),
             1710000000
         );
-        // No assert, just ensure no abort
+        let opt_req = payment_request::get_payment_request(signer::address_of(sender));
+        assert!(option::is_some(&opt_req), 302);
     }
 
     #[test(sender = @paylancer_addr)]
@@ -67,7 +75,8 @@ module paylancer_addr::test_paylancer {
             string::utf8(b"active"),
             1710000000
         );
-        // No assert, just ensure no abort
+        let opt_card = virtual_cards::get_virtual_card(signer::address_of(sender));
+        assert!(option::is_some(&opt_card), 303);
     }
 
     #[test(sender = @paylancer_addr)]
@@ -82,6 +91,7 @@ module paylancer_addr::test_paylancer {
             string::utf8(b"active"),
             1710000000
         );
-        // No assert, just ensure no abort
+        let opt_account = virtual_accounts::get_virtual_account(signer::address_of(sender));
+        assert!(option::is_some(&opt_account), 304);
     }
 }

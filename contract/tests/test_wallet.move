@@ -37,6 +37,10 @@ module paylancer_addr::test_wallet {
             option::some(string::utf8(b"imported"))
         );
         wallet::update_wallet_name(sender, string::utf8(b"Updated Wallet Name"));
+        let opt_wallet = wallet::get_wallet(signer::address_of(sender));
+        assert!(option::is_some(&opt_wallet), 100);
+        let w = option::extract(opt_wallet);
+        assert!(w.wallet_name == string::utf8(b"Updated Wallet Name"), 101);
     }
 
     #[test(sender = @paylancer_addr)]
@@ -55,5 +59,7 @@ module paylancer_addr::test_wallet {
             option::none<string::String>()
         );
         wallet::delete_wallet(sender);
+        let opt_wallet = wallet::get_wallet(signer::address_of(sender));
+        assert!(!option::is_some(&opt_wallet), 102);
     }
 }
