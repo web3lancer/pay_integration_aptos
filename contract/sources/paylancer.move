@@ -3,77 +3,77 @@ module paylancer_addr::paylancer {
     use std::vector;
     use std::option::{Self, Option};
     use aptos_framework::event::{EventHandle, emit_event};
+    use paylancer_addr::user;
+    use paylancer_addr::wallet;
+    use paylancer_addr::payment_request;
 
-    /// User resource
-    struct User has key {
-        user_id: String,
-        email: String,
-        username: String,
-        display_name: String,
-        profile_image: Option<String>,
-        phone_number: Option<String>,
-        kyc_status: String,
-        kyc_level: u64,
-        two_factor_enabled: bool,
-        is_active: bool,
-        country: Option<String>,
-        timezone: Option<String>,
-        preferred_currency: String,
-        created_at: u64,
-        updated_at: u64,
-        wallet_ids: vector<String>,
-        transaction_ids: vector<String>,
-        payment_request_ids: vector<String>,
-        security_log_ids: vector<String>,
-        api_key_ids: vector<String>,
+    /// Events for logging actions
+    struct PaylancerEvents has key {
+        user_created: EventHandle<User>,
+        wallet_created: EventHandle<Wallet>,
+        transaction_created: EventHandle<Transaction>,
+        payment_request_created: EventHandle<PaymentRequest>,
+        virtual_card_created: EventHandle<VirtualCard>,
+        virtual_account_created: EventHandle<VirtualAccount>,
     }
 
-    /// Wallet resource
-    struct Wallet has key {
-        wallet_id: String,
-        user_id: String,
-        wallet_name: String,
-        wallet_type: String,
-        blockchain: String,
-        public_key: String,
-        encrypted_private_key: Option<String>,
-        wallet_address: String,
-        derivation_path: Option<String>,
+    /// Initialize events for the module
+    public entry fun init_events(account: &signer) {
+        move_to(account, PaylancerEvents {
+            user_created: aptos_framework::event::new_event_handle<User>(account),
+            wallet_created: aptos_framework::event::new_event_handle<Wallet>(account),
+            transaction_created: aptos_framework::event::new_event_handle<Transaction>(account),
+            payment_request_created: aptos_framework::event::new_event_handle<PaymentRequest>(account),
+            virtual_card_created: aptos_framework::event::new_event_handle<VirtualCard>(account),
+            virtual_account_created: aptos_framework::event::new_event_handle<VirtualAccount>(account),
+        });
+    }
+
+    /// Example: Forward create_user to user module
+    public entry fun create_user(
+        account: &signer,
+        user_id: std::string::String,
+        email: std::string::String,
+        username: std::string::String,
+        display_name: std::string::String,
+        preferred_currency: std::string::String,
+        created_at: u64
+    ) {
+        user::create_user(account, user_id, email, username, display_name, preferred_currency, created_at);
+    }
+
+    /// Example: Forward create_wallet to wallet module
+    public entry fun create_wallet(
+        account: &signer,
+        wallet_id: std::string::String,
+        user_id: std::string::String,
+        wallet_name: std::string::String,
+        wallet_type: std::string::String,
+        blockchain: std::string::String,
+        public_key: std::string::String,
+        wallet_address: std::string::String,
         is_default: bool,
-        is_active: bool,
-        balance: u64,
-        last_sync_at: Option<u64>,
         created_at: u64,
-        creation_method: Option<String>,
+        creation_method: std::option::Option<std::string::String>
+    ) {
+        wallet::create_wallet(account, wallet_id, user_id, wallet_name, wallet_type, blockchain, public_key, wallet_address, is_default, created_at, creation_method);
     }
 
-    /// Token resource
-    struct Token has key {
-        token_id: String,
-        symbol: String,
-        name: String,
-        blockchain: String,
-        contract_address: Option<String>,
-        decimals: u8,
-        logo_url: Option<String>,
-        is_stablecoin: bool,
-        is_active: bool,
-        market_cap: u64,
-        current_price: u64,
-        price_change_24h: u64,
-        last_price_update: Option<u64>,
-        created_at: u64,
+    /// Example: Forward create_payment_request to payment_request module
+    public entry fun create_payment_request(
+        account: &signer,
+        request_id: std::string::String,
+        from_user_id: std::string::String,
+        token_id: std::string::String,
+        amount: u64,
+        status: std::string::String,
+        created_at: u64
+    ) {
+        payment_request::create_payment_request(account, request_id, from_user_id, token_id, amount, status, created_at);
     }
 
-    /// Transaction resource
-    struct Transaction has key {
-        transaction_id: String,
-        tx_hash: Option<String>,
-        from_user_id: String,
-        to_user_ids: vector<String>,
-        from_wallet_id: String,
-        to_wallet_id: Option<String>,
-        from_address: String,
+    // ...add similar forwarding for other resources/modules...
+}
         to_address: String,
         token_id: String,
         amount: u64,
